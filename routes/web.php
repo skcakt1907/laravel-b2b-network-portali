@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
+use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\InvitationController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DirectoryController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
@@ -57,7 +59,11 @@ Route::middleware('auth')->group(function () {
     Route::view('/panel', 'panel.index')->name('panel');
 
     // Misafir de gorebilir (icerik ayrica EventPolicy ile suzulur)
-    Route::view('/etkinlikler', 'panel.yapim-asamasi')->name('etkinlikler');
+    Route::get('/etkinlikler', [EventController::class, 'index'])->name('etkinlikler');
+    Route::get('/etkinlikler/{etkinlik}', [EventController::class, 'show'])
+        ->name('etkinlikler.detay');
+    Route::post('/etkinlikler/{etkinlik}/katilim', [EventController::class, 'rsvp'])
+        ->name('etkinlikler.katilim');
 
     // Misafir de kendi profilini duzenleyebilir
     Route::get('/profilim', [ProfileController::class, 'edit'])->name('profilim');
@@ -97,7 +103,26 @@ Route::middleware('auth')->group(function () {
             ->name('uyeler.durum');
         Route::post('/uyeler/{uye}/anonimlestir', [AdminUserController::class, 'anonimlestir'])
             ->name('uyeler.anonimlestir');
-        Route::view('/etkinlikler', 'panel.yapim-asamasi')->name('etkinlikler');
+        // Etkinlik yonetimi
+        Route::get('/etkinlikler', [AdminEventController::class, 'index'])->name('etkinlikler.index');
+        Route::get('/etkinlikler/olustur', [AdminEventController::class, 'create'])
+            ->name('etkinlikler.olustur');
+        Route::post('/etkinlikler', [AdminEventController::class, 'store'])->name('etkinlikler.kaydet');
+        Route::get('/etkinlikler/{etkinlik}', [AdminEventController::class, 'edit'])
+            ->name('etkinlikler.duzenle');
+        Route::post('/etkinlikler/{etkinlik}', [AdminEventController::class, 'update'])
+            ->name('etkinlikler.guncelle');
+        Route::delete('/etkinlikler/{etkinlik}', [AdminEventController::class, 'destroy'])
+            ->name('etkinlikler.sil');
+        Route::post('/etkinlikler/{etkinlik}/sirala', [AdminEventController::class, 'sirala'])
+            ->name('etkinlikler.sirala');
+        Route::post('/etkinlikler/{etkinlik}/sira', [AdminEventController::class, 'siraKaydet'])
+            ->name('etkinlikler.siraKaydet');
+        Route::post('/etkinlikler/{etkinlik}/yoklama', [AdminEventController::class, 'yoklama'])
+            ->name('etkinlikler.yoklama');
+        Route::get('/etkinlikler/{etkinlik}/disa-aktar', [AdminEventController::class, 'disaAktar'])
+            ->name('etkinlikler.disaAktar');
+
         Route::view('/coin', 'panel.yapim-asamasi')->name('coin');
     });
 });

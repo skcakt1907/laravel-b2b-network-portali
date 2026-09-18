@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Company;
 use App\Models\Profile;
+use App\Models\Event;
+use App\Models\EventAttendee;
 use App\Models\Invitation;
 use App\Models\MembershipApplication;
 use App\Models\User;
@@ -103,6 +105,45 @@ class E2ESeeder extends Seeder
         }
 
         $this->dizinOrnekleri();
+        $this->etkinlikleriHazirla();
+    }
+
+    /**
+     * Etkinlik testlerinin dayandigi etkinlikler.
+     * RSVP testi durum uretir, bu yuzden her proje kendi etkinliginde calisir
+     * ve her kosuda yanitlar temizlenir.
+     */
+    private function etkinlikleriHazirla(): void
+    {
+        foreach (['chromium', 'mobil'] as $proje) {
+            $misafireAcik = Event::firstOrNew(['slug' => "e2e-rsvp-toplantisi-{$proje}"]);
+            $misafireAcik->fill([
+                'title' => "E2E RSVP Toplantisi ({$proje})",
+                'description' => 'E2E testleri icin olusturulmustur.',
+                'type' => 'online',
+                'category' => 'toplanti',
+                'starts_at' => now()->addMonth(),
+                'online_url' => 'https://zoom.us/j/e2etest',
+                'visibility' => 'uye_misafir',
+                'is_published' => true,
+                'has_presentations' => true,
+            ]);
+            $misafireAcik->save();
+
+            // Onceki kosunun yanitlari silinir; testler temiz baslar
+            EventAttendee::where('event_id', $misafireAcik->id)->delete();
+
+            $uyelereOzel = Event::firstOrNew(['slug' => "e2e-uyelere-ozel-{$proje}"]);
+            $uyelereOzel->fill([
+                'title' => "E2E Uyelere Ozel ({$proje})",
+                'type' => 'online',
+                'category' => 'toplanti',
+                'starts_at' => now()->addMonth(),
+                'visibility' => 'uye',
+                'is_published' => true,
+            ]);
+            $uyelereOzel->save();
+        }
     }
 
     /**
