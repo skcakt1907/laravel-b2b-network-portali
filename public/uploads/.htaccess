@@ -1,0 +1,45 @@
+# DN Unity - yukleme klasoru sertlestirmesi
+#
+# Buraya kullanici dosyalari geliyor. Bir sekilde icine betik sizarsa bile
+# calistirilamamalidir. Gorseller GD ile yeniden kodlaniyor, dokumanlarda
+# boyle bir sans yok; bu dosya ikinci savunma katidir.
+
+# --- Betik calistirmayi tamamen kapat ---
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+# PHP-FPM / CGI altinda yukaridaki yonergeler islemez; islayici esleme kaldirilir
+<IfModule mod_mime.c>
+    RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .phps .pht .phar
+    RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .phps .pht .phar
+    AddType text/plain .php .phtml .php3 .php4 .php5 .php7 .php8 .phps .pht .phar
+</IfModule>
+
+<IfModule mod_cgi.c>
+    Options -ExecCGI
+</IfModule>
+
+Options -Indexes
+
+# --- Yalnizca beklenen dosya turlerine izin ver ---
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(?i:jpe?g|png|webp|gif|pdf)$">
+        Require all granted
+    </FilesMatch>
+    <FilesMatch "^(?!.*\.(?i:jpe?g|png|webp|gif|pdf)$).*$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+# --- Tarayicinin turu kendi tahmin etmesini engelle ---
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'none'; script-src 'none'"
+</IfModule>
