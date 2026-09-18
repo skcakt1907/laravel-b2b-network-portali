@@ -37,6 +37,7 @@
 
             @if(auth()->check() && auth()->user()->isAdmin())
                 <div class="sidebar-section">Yonetim</div>
+                @include('partials.sidebar-link', ['href' => route('yonetim.index'), 'icon' => 'speedometer2', 'label' => 'Yonetim Paneli'])
                 @include('partials.sidebar-link', ['href' => route('yonetim.basvurular.index'), 'icon' => 'inbox',       'label' => 'Basvurular'])
                 @include('partials.sidebar-link', ['href' => route('yonetim.davetler.index'),  'icon' => 'envelope-plus','label' => 'Davet Baglari'])
                 @include('partials.sidebar-link', ['href' => route('yonetim.uyeler.index'),      'icon' => 'person-gear',  'label' => 'Uye Yonetimi'])

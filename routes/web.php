@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\InvitationController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DirectoryController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\PanelController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
@@ -56,7 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/sifre-degistir', [PasswordResetController::class, 'change'])
         ->name('sifre.degistir.kaydet');
 
-    Route::view('/panel', 'panel.index')->name('panel');
+    Route::get('/panel', [PanelController::class, 'index'])->name('panel');
 
     // Misafir de gorebilir (icerik ayrica EventPolicy ile suzulur)
     Route::get('/etkinlikler', [EventController::class, 'index'])->name('etkinlikler');
@@ -78,7 +80,7 @@ Route::middleware('auth')->group(function () {
 
     // ------------------------------------------------------------ yonetim
     Route::middleware('admin')->prefix('yonetim')->name('yonetim.')->group(function () {
-        Route::view('/', 'panel.yapim-asamasi')->name('index');
+        Route::get('/', [DashboardController::class, 'index'])->name('index');
 
         // Basvurular
         Route::get('/basvurular', [AdminApplicationController::class, 'index'])
