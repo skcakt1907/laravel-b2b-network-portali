@@ -2,11 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\Company;
+use App\Models\Profile;
 use App\Models\Invitation;
 use App\Models\MembershipApplication;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 /**
  * Playwright testlerinin dayandigi sabit hesaplar.
@@ -89,6 +92,78 @@ class E2ESeeder extends Seeder
             'status' => 'aktif',
             'guest_expires_at' => now()->subDay(),
         ]);
+
+        // Profil duzenleme testi de hesabi tuketir (metinleri ve is_listed'i degistirir)
+        foreach (['chromium', 'mobil'] as $proje) {
+            $uye = $this->hesap("e2e-profil-{$proje}@dnunity.test", "E2E Profil Uyesi {$proje}", [
+                'role' => User::ROL_UYE,
+                'status' => 'aktif',
+            ]);
+            $this->profil($uye, ['is_listed' => true]);
+        }
+
+        $this->dizinOrnekleri();
+    }
+
+    /**
+     * Uye dizini testlerinin dayandigi ornek uyeler.
+     * Testler elle girilmis veriye dayanmamali; burada uretilir.
+     */
+    private function dizinOrnekleri(): void
+    {
+        $ornekler = [
+            ['Selin Aydin', 'Kurucu Ortak', 'Mavi Reklam Ajansi', 'Reklam ve Tanitim', 'Bodrum', 'dnkreatif',
+                'Kurumsal kimlik, sosyal medya yonetimi ve dijital reklam kampanyalari yurutuyoruz.',
+                'Turizm ve saglik sektorunden uzun soluklu is birlikleri ariyoruz.', '05321112233'],
+            ['Kerem Dogan', 'Genel Mudur', 'Ege Yatcilik', 'Turizm', 'Marmaris', 'tatilimsensin',
+                'Gunluk ve haftalik tekne turlari, ozel yat kiralama hizmeti veriyoruz.',
+                'Acentelerle ve kurumsal etkinlik organizatorleriyle calismak istiyoruz.', '05334445566'],
+            ['Ayse Kocak', 'Mali Musavir', 'Kocak Mali Musavirlik', 'Danismanlik', 'Mugla', 'ikisi',
+                'KOBI muhasebesi, vergi planlamasi ve sirket kurulus danismanligi.',
+                'Yeni kurulan isletmelere ulasmak istiyoruz.', '05446667788'],
+            ['Burak Yildiz', 'Yazilim Gelistirici', 'Yildiz Teknoloji', 'Bilisim', 'Izmir', 'dnkreatif',
+                'Web sitesi, e-ticaret ve mobil uygulama gelistiriyoruz.',
+                'Dijital donusum ihtiyaci olan KOBI lerle tanismak istiyoruz.', '05779990011'],
+        ];
+
+        foreach ($ornekler as [$ad, $unvan, $firmaAd, $sektor, $sehir, $marka, $hizmet, $arayis, $tel]) {
+            $firma = Company::firstOrNew(['slug' => Str::slug($firmaAd)]);
+            $firma->name = $firmaAd;
+            $firma->sector = $sektor;
+            $firma->city = $sehir;
+            $firma->save();
+
+            $uye = $this->hesap(Str::slug($ad).'@ornek.test', $ad, [
+                'role' => User::ROL_UYE,
+                'status' => 'aktif',
+            ]);
+            $uye->forceFill([
+                'title' => $unvan,
+                'phone' => $tel,
+                'company_id' => $firma->id,
+            ])->save();
+
+            $this->profil($uye, [
+                'brand' => $marka,
+                'services_pitch' => $hizmet,
+                'seeking_pitch' => $arayis,
+                'whatsapp' => $tel,
+                'is_listed' => true,
+            ]);
+        }
+    }
+
+    /** Profil kaydini olusturur/sifirlar. user_id $fillable disinda, acikca atanir. */
+    private function profil(User $uye, array $degerler): void
+    {
+        $p = Profile::firstOrNew(['user_id' => $uye->id]);
+        $p->user_id = $uye->id;
+        $p->brand = $degerler['brand'] ?? null;
+        $p->services_pitch = $degerler['services_pitch'] ?? null;
+        $p->seeking_pitch = $degerler['seeking_pitch'] ?? null;
+        $p->whatsapp = $degerler['whatsapp'] ?? null;
+        $p->is_listed = $degerler['is_listed'] ?? true;
+        $p->save();
     }
 
     /**
@@ -127,7 +202,7 @@ class E2ESeeder extends Seeder
         }
     }
 
-    private function hesap(string $eposta, string $ad, array $korumali): void
+    private function hesap(string $eposta, string $ad, array $korumali): User
     {
         $u = User::firstOrNew(['email' => $eposta]);
         $u->name = $ad;
@@ -142,5 +217,7 @@ class E2ESeeder extends Seeder
         $u->approved_at = $korumali['status'] === 'aktif' ? now() : null;
 
         $u->save();
+
+        return $u;
     }
 }

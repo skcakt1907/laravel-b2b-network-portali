@@ -5,7 +5,9 @@ use App\Http\Controllers\Admin\InvitationController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DirectoryController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -56,11 +58,15 @@ Route::middleware('auth')->group(function () {
 
     // Misafir de gorebilir (icerik ayrica EventPolicy ile suzulur)
     Route::view('/etkinlikler', 'panel.yapim-asamasi')->name('etkinlikler');
-    Route::view('/profilim', 'panel.yapim-asamasi')->name('profilim');
+
+    // Misafir de kendi profilini duzenleyebilir
+    Route::get('/profilim', [ProfileController::class, 'edit'])->name('profilim');
+    Route::post('/profilim', [ProfileController::class, 'update'])->name('profilim.guncelle');
 
     // ------------------------------------------------------------ uyelere ozel
     Route::middleware('uye')->group(function () {
-        Route::view('/uyeler', 'panel.yapim-asamasi')->name('uyeler');
+        Route::get('/uyeler', [DirectoryController::class, 'index'])->name('uyeler');
+        Route::get('/uyeler/{uye}', [DirectoryController::class, 'show'])->name('uyeler.show');
         Route::view('/cuzdan', 'panel.yapim-asamasi')->name('cuzdan');
     });
 
