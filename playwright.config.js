@@ -5,8 +5,17 @@ const PHP = 'C:/wamp64/bin/php/php8.3.28/php.exe';
 export default defineConfig({
     testDir: './tests/e2e',
     timeout: 30000,
-    fullyParallel: false,
     reporter: [['list']],
+
+    /*
+     * Testler tek bir gercek veritabanina ve tek bir hiz siniri sayacina karsi
+     * kosuyor. Playwright varsayilan olarak spec dosyalarini paralel iscilere
+     * dagitir; bu durumda testler birbirinin verisine ve hiz sinirina takilir
+     * (kosudan kosuya degisen, tekrar uretilemeyen hatalar). Tek isci
+     * kosuyu yavaslatir ama deterministik yapar.
+     */
+    fullyParallel: false,
+    workers: 1,
 
     // Testlerin dayandigi sabit hesaplari her kosudan once yeniler
     globalSetup: './tests/e2e/global-setup.js',
