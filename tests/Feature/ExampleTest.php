@@ -2,18 +2,21 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
     /**
-     * A basic test example.
+     * DN Unity kapali devredir: ana sayfa herkese acik bir tanitim degil,
+     * girisi olmayani giris ekranina gonderen bir kapidir.
      */
-    public function test_the_application_returns_a_successful_response(): void
+    public function test_ana_sayfa_misafiri_girise_yonlendirir(): void
     {
-        $response = $this->get('/');
+        $this->get('/')->assertRedirect(route('giris'));
+    }
 
-        $response->assertStatus(200);
+    public function test_saglik_kontrolu_calisir(): void
+    {
+        $this->get('/up')->assertStatus(200);
     }
 }
