@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
 use App\Http\Controllers\Admin\InvitationController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordResetController;
@@ -83,7 +84,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('/davetler/{davet}', [InvitationController::class, 'destroy'])
             ->name('davetler.destroy');
 
-        Route::view('/uyeler', 'panel.yapim-asamasi')->name('uyeler');
+        // Uye yonetimi
+        Route::get('/uyeler', [AdminUserController::class, 'index'])->name('uyeler.index');
+        Route::get('/uyeler/{uye}', [AdminUserController::class, 'show'])->name('uyeler.show');
+        Route::post('/uyeler/{uye}/durum', [AdminUserController::class, 'durum'])
+            ->name('uyeler.durum');
+        Route::post('/uyeler/{uye}/anonimlestir', [AdminUserController::class, 'anonimlestir'])
+            ->name('uyeler.anonimlestir');
         Route::view('/etkinlikler', 'panel.yapim-asamasi')->name('etkinlikler');
         Route::view('/coin', 'panel.yapim-asamasi')->name('coin');
     });

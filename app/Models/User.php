@@ -57,6 +57,11 @@ class User extends Authenticatable
         return $this->belongsTo(User::class, 'invited_by');
     }
 
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
     public function sentInvitations(): HasMany
     {
         return $this->hasMany(Invitation::class, 'invited_by');

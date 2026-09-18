@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureAccountActive;
 use App\Http\Middleware\EnsurePasswordChanged;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsMember;
@@ -19,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn () => route('giris'));
 
         $middleware->web(append: [
+            // Sira onemli: once hesap hala gecerli mi, sonra sifre zorunlulugu
+            EnsureAccountActive::class,
             EnsurePasswordChanged::class,
         ]);
 

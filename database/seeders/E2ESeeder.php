@@ -70,6 +70,14 @@ class E2ESeeder extends Seeder
             ]);
         }
 
+        // Dondurma testi de hesabi tuketir (durumunu degistirir)
+        foreach (['chromium', 'mobil'] as $proje) {
+            $this->hesap("e2e-dondur-{$proje}@dnunity.test", "E2E Dondurulacak Uye ({$proje})", [
+                'role' => User::ROL_UYE,
+                'status' => 'aktif',
+            ]);
+        }
+
         $this->hesap('e2e-misafir@dnunity.test', 'E2E Gecerli Misafir', [
             'role' => User::ROL_MISAFIR,
             'status' => 'aktif',
