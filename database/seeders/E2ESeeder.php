@@ -48,6 +48,12 @@ class E2ESeeder extends Seeder
             ]);
         }
 
+        $this->hesap('e2e-misafir@dnunity.test', 'E2E Gecerli Misafir', [
+            'role' => User::ROL_MISAFIR,
+            'status' => 'aktif',
+            'guest_expires_at' => now()->addMonth(),
+        ]);
+
         $this->hesap('e2e-misafir-dolmus@dnunity.test', 'E2E Suresi Dolmus Misafir', [
             'role' => User::ROL_MISAFIR,
             'status' => 'aktif',

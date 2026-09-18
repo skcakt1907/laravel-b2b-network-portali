@@ -6,12 +6,15 @@
 @section('content')
 
     <div class="row g-3 mb-4">
-        <div class="col-6 col-lg-3">
-            <div class="stat">
-                <div class="stat-label">Unitycoin bakiyeniz</div>
-                <div class="stat-value">{{ number_format(auth()->user()->coinBalance(), 0, ',', '.') }} <small>UC</small></div>
+        {{-- Misafirin Unitycoin cuzdani yoktur; kart da gosterilmez --}}
+        @unless(auth()->user()->isMisafir())
+            <div class="col-6 col-lg-3">
+                <div class="stat">
+                    <div class="stat-label">Unitycoin bakiyeniz</div>
+                    <div class="stat-value">{{ number_format(auth()->user()->coinBalance(), 0, ',', '.') }} <small>UC</small></div>
+                </div>
             </div>
-        </div>
+        @endunless
         <div class="col-6 col-lg-3">
             <div class="stat">
                 <div class="stat-label">Katildiginiz etkinlik</div>

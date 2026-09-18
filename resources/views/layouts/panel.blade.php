@@ -24,18 +24,23 @@
 
         <nav class="flex-grow-1">
             <div class="sidebar-section">Menu</div>
-            @include('partials.sidebar-link', ['href' => url('/panel'),      'icon' => 'grid-1x2',   'label' => 'Panel'])
-            @include('partials.sidebar-link', ['href' => url('/uyeler'),     'icon' => 'people',     'label' => 'Uye Dizini'])
-            @include('partials.sidebar-link', ['href' => url('/etkinlikler'),'icon' => 'calendar-event', 'label' => 'Etkinlikler'])
-            @include('partials.sidebar-link', ['href' => url('/cuzdan'),     'icon' => 'wallet2',    'label' => 'Unitycoin'])
-            @include('partials.sidebar-link', ['href' => url('/profilim'),   'icon' => 'person-badge','label' => 'Profilim'])
+            @include('partials.sidebar-link', ['href' => route('panel'),       'icon' => 'grid-1x2',       'label' => 'Panel'])
+            @include('partials.sidebar-link', ['href' => route('etkinlikler'), 'icon' => 'calendar-event', 'label' => 'Etkinlikler'])
+
+            {{-- Misafirin uye dizini ve cuzdani yoktur; rotalar da 'uye' middleware'i ile kapali --}}
+            @can('viewAny', App\Models\User::class)
+                @include('partials.sidebar-link', ['href' => route('uyeler'), 'icon' => 'people',  'label' => 'Uye Dizini'])
+                @include('partials.sidebar-link', ['href' => route('cuzdan'), 'icon' => 'wallet2', 'label' => 'Unitycoin'])
+            @endcan
+
+            @include('partials.sidebar-link', ['href' => route('profilim'), 'icon' => 'person-badge', 'label' => 'Profilim'])
 
             @if(auth()->check() && auth()->user()->isAdmin())
                 <div class="sidebar-section">Yonetim</div>
-                @include('partials.sidebar-link', ['href' => url('/yonetim/basvurular'), 'icon' => 'inbox',    'label' => 'Basvurular'])
-                @include('partials.sidebar-link', ['href' => url('/yonetim/uyeler'),     'icon' => 'person-gear','label' => 'Uye Yonetimi'])
-                @include('partials.sidebar-link', ['href' => url('/yonetim/etkinlikler'),'icon' => 'calendar-plus','label' => 'Etkinlik Yonetimi'])
-                @include('partials.sidebar-link', ['href' => url('/yonetim/coin'),       'icon' => 'coin',     'label' => 'Coin Yonetimi'])
+                @include('partials.sidebar-link', ['href' => route('yonetim.basvurular'),  'icon' => 'inbox',        'label' => 'Basvurular'])
+                @include('partials.sidebar-link', ['href' => route('yonetim.uyeler'),      'icon' => 'person-gear',  'label' => 'Uye Yonetimi'])
+                @include('partials.sidebar-link', ['href' => route('yonetim.etkinlikler'), 'icon' => 'calendar-plus','label' => 'Etkinlik Yonetimi'])
+                @include('partials.sidebar-link', ['href' => route('yonetim.coin'),        'icon' => 'coin',         'label' => 'Coin Yonetimi'])
             @endif
         </nav>
     </aside>
@@ -51,9 +56,12 @@
 
             <div class="ms-auto d-flex align-items-center gap-3">
                 @auth
-                    <span class="badge-ui badge-gold">
-                        <i class="bi bi-coin"></i> {{ number_format(auth()->user()->coinBalance(), 0, ',', '.') }}
-                    </span>
+                    {{-- Misafirin Unitycoin cuzdani yoktur --}}
+                    @unless(auth()->user()->isMisafir())
+                        <span class="badge-ui badge-gold">
+                            <i class="bi bi-coin"></i> {{ number_format(auth()->user()->coinBalance(), 0, ',', '.') }}
+                        </span>
+                    @endunless
                     <div class="dropdown">
                         <button class="btn btn-ghost btn-sm dropdown-toggle" data-bs-toggle="dropdown" type="button">
                             {{ auth()->user()->name }}

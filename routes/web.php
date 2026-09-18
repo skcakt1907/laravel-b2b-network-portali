@@ -38,6 +38,25 @@ Route::middleware('auth')->group(function () {
         ->name('sifre.degistir.kaydet');
 
     Route::view('/panel', 'panel.index')->name('panel');
+
+    // Misafir de gorebilir (icerik ayrica EventPolicy ile suzulur)
+    Route::view('/etkinlikler', 'panel.yapim-asamasi')->name('etkinlikler');
+    Route::view('/profilim', 'panel.yapim-asamasi')->name('profilim');
+
+    // ------------------------------------------------------------ uyelere ozel
+    Route::middleware('uye')->group(function () {
+        Route::view('/uyeler', 'panel.yapim-asamasi')->name('uyeler');
+        Route::view('/cuzdan', 'panel.yapim-asamasi')->name('cuzdan');
+    });
+
+    // ------------------------------------------------------------ yonetim
+    Route::middleware('admin')->prefix('yonetim')->name('yonetim.')->group(function () {
+        Route::view('/', 'panel.yapim-asamasi')->name('index');
+        Route::view('/basvurular', 'panel.yapim-asamasi')->name('basvurular');
+        Route::view('/uyeler', 'panel.yapim-asamasi')->name('uyeler');
+        Route::view('/etkinlikler', 'panel.yapim-asamasi')->name('etkinlikler');
+        Route::view('/coin', 'panel.yapim-asamasi')->name('coin');
+    });
 });
 
 // Gecici: tasarim sistemi on izlemesi. Yayina cikmadan once kaldirilacak.
